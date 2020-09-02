@@ -1,0 +1,22 @@
+plugins {
+    id 'java'
+    id 'org.openjfx.javafxplugin' version '0.0.8'
+    id 'application'
+}
+
+javafx {
+    version = "11.0.2"
+    modules = [ 'javafx.controls' ]
+}
+
+group 'com.kodilla'
+version '1.0-SNAPSHOT'
+mainClassName = 'CheckersMain'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
