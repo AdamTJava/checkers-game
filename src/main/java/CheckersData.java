@@ -130,7 +130,7 @@ public class CheckersData {
         if (moveList.size() == 0) {
             for (int row = 0; row < 8; row++) {
                 for (int col = 0; col < 8; col++) {
-                    if (board[row][col] == player) {
+                    if (board[row][col] == player || board[row][col] == playerQueen) {
                         if (canMove(player, row, col, row + 1, col + 1))
                             moveList.add(new CheckersMove(row, col, row + 1, col + 1));
                         if (canMove(player, row, col, row - 1, col + 1))
@@ -140,15 +140,17 @@ public class CheckersData {
                         if (canMove(player, row, col, row - 1, col - 1))
                             moveList.add(new CheckersMove(row, col, row - 1, col - 1));
                     }
-                    if (board[row][col] == playerQueen) {
-                        for (int i = 0; i < 8; i++) {
-                            for (int k = 0; k < 8; k++) {
-                                if (canMove(player, row, col, i, k) & i % 2 != k % 2) {
-                                    moveList.add(new CheckersMove(row, col, i, k));
-                                }
-                            }
-                        }
-                    }
+                    //próba zrobienia osobnej logiki dla królowej, która morze chodzić po czym chce, co jest czarnym polem
+                    //dosyć prymitywna i nie udało mi się jej rozwinąć, ale zostawiam poglądowo.
+                    //if (board[row][col] == playerQueen) {
+                    //    for (int i = 0; i < 8; i++) {
+                    //        for (int k = 0; k < 8; k++) {
+                    //           if (canMove(player, row, col, i, k) & i % 2 != k % 2) {
+                    //                moveList.add(new CheckersMove(row, col, i, k));
+                    //            }
+                    //        }
+                    //    }
+                    //}
                 }
             }
         }
