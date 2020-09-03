@@ -14,6 +14,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -366,9 +367,11 @@ public class CheckersBoard extends Canvas {
                             legalMoves.get(i).fromRow == randomFromRow & legalMoves.get(i).fromCol == randomFromCol) {
                         selectedRow = randomFromRow;
                         selectedCol = randomFromCol;
-                        board.setStroke(Color.RED);// dlaczego to nie działa ?!
-                        board.setLineWidth(4);
-                        board.strokeRect(5 + randomFromCol * 100, 5 + randomFromRow * 100, 96, 96);
+                        board.setStroke(Color.RED);// dlaczego to nie działa ?
+                        board.setLineWidth(4);// jest zrobione identycznie jak poniżej w metodzie clickSquare(), gdzie działa
+                        board.strokeRect(5 + randomFromCol * 100, 5 + randomFromRow * 100, 96, 96);// próbowałem nawet poprzez
+                        //debugowanie zatrzymać aplikację po wykonaniu pierwszej metody computerMove(), żeby zobaczyć, czy zaznacza to pole
+                        //ale niestety nie robi tego.
                         return;
                     }
                 }

@@ -127,9 +127,10 @@ public class CheckersData {
                 }
             }
         }
+        if (moveList.size() == 0) {
             for (int row = 0; row < 8; row++) {
                 for (int col = 0; col < 8; col++) {
-                    if (board[row][col] == player || board[row][col] == playerQueen) {
+                    if (board[row][col] == player) {
                         if (canMove(player, row, col, row + 1, col + 1))
                             moveList.add(new CheckersMove(row, col, row + 1, col + 1));
                         if (canMove(player, row, col, row - 1, col + 1))
@@ -139,16 +140,18 @@ public class CheckersData {
                         if (canMove(player, row, col, row - 1, col - 1))
                             moveList.add(new CheckersMove(row, col, row - 1, col - 1));
                     }
-                    //if (board[row][col] == playerQueen) {
-                    //    for (int i = 0; i < 8; i++) {
-                    //        for (int k = 0; k < 8; k++) {
-                    //            if (canMove(player, row, col, i, k) & i % 2 != k % 2)
-                    //                moveList.add(new CheckersMove(row, col, i, k));
-                    //        }
-                    //    }
-                    //}
+                    if (board[row][col] == playerQueen) {
+                        for (int i = 0; i < 8; i++) {
+                            for (int k = 0; k < 8; k++) {
+                                if (canMove(player, row, col, i, k) & i % 2 != k % 2) {
+                                    moveList.add(new CheckersMove(row, col, i, k));
+                                }
+                            }
+                        }
+                    }
                 }
             }
+        }
         if (moveList.size() == 0) {
             return null;
         } else {
@@ -168,14 +171,14 @@ public class CheckersData {
 
         ArrayList<CheckersMove> jumpList = new ArrayList<>();
         if (board[row][col] == player || board[row][col] == playerQueen) {
-            if (canJump(player, row, col, row+1, col+1, row+2, col+2))
-                jumpList.add(new CheckersMove(row, col, row+2, col+2));
-            if (canJump(player, row, col, row-1, col+1, row-2, col+2))
-                jumpList.add(new CheckersMove(row, col, row-2, col+2));
-            if (canJump(player, row, col, row+1, col-1, row+2, col-2))
-                jumpList.add(new CheckersMove(row, col, row+2, col-2));
-            if (canJump(player, row, col, row-1, col-1, row-2, col-2))
-                jumpList.add(new CheckersMove(row, col, row-2, col-2));
+            if (canJump(player, row, col, row + 1, col + 1, row + 2, col + 2))
+                jumpList.add(new CheckersMove(row, col, row + 2, col + 2));
+            if (canJump(player, row, col, row - 1, col + 1, row - 2, col + 2))
+                jumpList.add(new CheckersMove(row, col, row - 2, col + 2));
+            if (canJump(player, row, col, row + 1, col - 1, row + 2, col - 2))
+                jumpList.add(new CheckersMove(row, col, row + 2, col - 2));
+            if (canJump(player, row, col, row - 1, col - 1, row - 2, col - 2))
+                jumpList.add(new CheckersMove(row, col, row - 2, col - 2));
         }
         if (jumpList.size() == 0)
             return null;
