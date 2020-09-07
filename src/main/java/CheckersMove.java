@@ -13,7 +13,15 @@ public class CheckersMove {
     }
 
     public boolean isJump() {
-        return (fromRow - toRow == 2 || fromRow - toRow == -2);
+        if ((CheckersData.board[toRow][toCol] == CheckersData.RED || CheckersData.board[toRow][toCol] == CheckersData.BLACK) &
+                (fromRow - toRow == 2 || fromRow - toRow == -2)) {
+            return true;
+        } else if ((CheckersData.board[toRow][toCol] == CheckersData.RED_QUEEN || CheckersData.board[toRow][toCol] == CheckersData.BLACK_QUEEN) &
+                (fromRow - toRow >= 2 || fromRow - toRow <= -2)) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     @Override

@@ -1,5 +1,7 @@
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class CheckersData {
 
@@ -10,7 +12,8 @@ public class CheckersData {
             BLACK = 3,
             BLACK_QUEEN = 4;
 
-    int[][] board;
+    public static int[][] board;
+    Map<Integer, Integer> queenMoveFields;
 
     public CheckersData() {
         board = new int[8][8];
@@ -40,6 +43,13 @@ public class CheckersData {
     private boolean canMove(int player, int rowFrom, int colFrom, int rowTo, int colTo) {
         if (rowTo < 0 || rowTo > 7 || colTo < 0 || colTo > 7)
             return false;
+        if (board[rowFrom][colFrom] == BLACK_QUEEN || board[rowFrom][colFrom] == RED_QUEEN) {
+            for (Map.Entry<Integer, Integer> eachField : queenMoveFields.entrySet()) {
+                if (board[eachField.getKey()][eachField.getValue()] != EMPTY) {
+                    return false;
+                }
+            }
+        }
         if (board[rowTo][colTo] != EMPTY || board[rowFrom][colFrom] == EMPTY)
             return false;
         if (player == RED) {
@@ -63,6 +73,27 @@ public class CheckersData {
         if (board[rowTo][colTo] != EMPTY)
             return false;
         if (player == RED) {
+            if (board[rowFrom][colFrom] == RED_QUEEN) {
+                for (Map.Entry<Integer, Integer> eachField : queenMoveFields.entrySet()) {
+                    if (board[eachField.getKey()][eachField.getValue()] == EMPTY & (board[rowMiddle][colMiddle] == BLACK ||
+                            board[rowMiddle][colMiddle] == BLACK_QUEEN)) {
+                        return true;
+                    }
+                    if (board[eachField.getKey()][eachField.getValue()] == EMPTY & board[rowMiddle][colMiddle] == EMPTY) {
+                        return false;
+                    }
+                    if (board[eachField.getKey()][eachField.getValue()] == RED || board[eachField.getKey()][eachField.getValue()] == RED_QUEEN ||
+                            board[rowMiddle][colMiddle] == RED || board[rowMiddle][colMiddle] == RED_QUEEN) {
+                        return false;
+                    }
+                    if ((board[eachField.getKey()][eachField.getValue()] == BLACK || board[eachField.getKey()][eachField.getValue()] == BLACK_QUEEN) &
+                            (board[rowMiddle][colMiddle] == BLACK || board[rowMiddle][colMiddle] == BLACK_QUEEN)) {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                }
+            }
             if (board[rowFrom][colFrom] == RED & rowTo < rowFrom) {
                 return false;
             } else if (board[rowMiddle][colMiddle] != BLACK & board[rowMiddle][colMiddle] != BLACK_QUEEN) {
@@ -71,6 +102,27 @@ public class CheckersData {
                 return true;
             }
         } else {
+            if (board[rowFrom][colFrom] == BLACK_QUEEN) {
+                for (Map.Entry<Integer, Integer> eachField : queenMoveFields.entrySet()) {
+                    if (board[eachField.getKey()][eachField.getValue()] == EMPTY & (board[rowMiddle][colMiddle] == RED ||
+                            board[rowMiddle][colMiddle] == RED_QUEEN)) {
+                        return true;
+                    }
+                    if (board[eachField.getKey()][eachField.getValue()] == EMPTY & board[rowMiddle][colMiddle] == EMPTY) {
+                        return false;
+                    }
+                    if (board[eachField.getKey()][eachField.getValue()] == BLACK || board[eachField.getKey()][eachField.getValue()] == BLACK_QUEEN ||
+                            board[rowMiddle][colMiddle] == BLACK || board[rowMiddle][colMiddle] == BLACK_QUEEN) {
+                        return false;
+                    }
+                    if ((board[eachField.getKey()][eachField.getValue()] == RED || board[eachField.getKey()][eachField.getValue()] == RED_QUEEN) &
+                            (board[rowMiddle][colMiddle] == RED || board[rowMiddle][colMiddle] == RED_QUEEN)) {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                }
+            }
             if (board[rowFrom][colFrom] == BLACK & rowTo > rowFrom) {
                 return false;
             } else if (board[rowMiddle][colMiddle] != RED & board[rowMiddle][colMiddle] != RED_QUEEN) {
@@ -82,10 +134,12 @@ public class CheckersData {
     }
 
     public void makeMove(CheckersMove move) {
+
         if (board[move.fromRow][move.fromCol] != EMPTY) {
             board[move.toRow][move.toCol] = board[move.fromRow][move.fromCol];
             board[move.fromRow][move.fromCol] = EMPTY;
         }
+
         if (move.isJump()) {
             int rowToErase = (move.fromRow + move.toRow) / 2;
             int colToErase = (move.fromCol + move.toCol) / 2;
@@ -112,10 +166,11 @@ public class CheckersData {
         }
 
         ArrayList<CheckersMove> moveList = new ArrayList<>();
+        queenMoveFields = new HashMap<>();
 
         for (int row = 0; row < 8; row++) {
             for (int col = 0; col < 8; col++) {
-                if (board[row][col] == player || board[row][col] == playerQueen) {
+                if (board[row][col] == player) {
                     if (canJump(player, row, col, row + 1, col + 1, row + 2, col + 2))
                         moveList.add(new CheckersMove(row, col, row + 2, col + 2));
                     if (canJump(player, row, col, row - 1, col + 1, row - 2, col + 2))
@@ -125,12 +180,63 @@ public class CheckersData {
                     if (canJump(player, row, col, row - 1, col - 1, row - 2, col - 2))
                         moveList.add(new CheckersMove(row, col, row - 2, col - 2));
                 }
+                if (board[row][col] == playerQueen) {
+                    for (int i = 1; i < 8; i++) {
+                        for (int k = 1; k < 8; k++) {
+                            if (i == k) {
+                                if (row + i + 1 <= 7 & col + k + 1 <= 7)
+                                    queenMoveFields.put(row + i + 1, col + k + 1);
+                                if (canJump(player, row, col, row + i, col + k, row + i + 1, col + k + 1)) {
+                                    moveList.add(new CheckersMove(row, col, row + i + 1, col + k + 1));
+                                }
+                            }
+                        }
+                    }
+                    queenMoveFields.clear();
+                    for (int i = 1; i < 8; i++) {
+                        for (int k = 1; k < 8; k++) {
+                            if (i == k) {
+                                if (row - i - 1 >= 0 & col + k + 1 <= 7)
+                                    queenMoveFields.put(row - i - 1, col + k + 1);
+                                if (canJump(player, row, col, row - i, col + k, row - i - 1, col + k + 1)) {
+                                    moveList.add(new CheckersMove(row, col, row - i - 1, col + k + 1));
+                                }
+                            }
+                        }
+                    }
+                    queenMoveFields.clear();
+                    for (int i = 1; i < 8; i++) {
+                        for (int k = 1; k < 8; k++) {
+                            if (i == k) {
+                                if (row + i + 1 <= 7 & col - k - 1 >= 0)
+                                    queenMoveFields.put(row + i + 1, col - k - 1);
+                                if (canJump(player, row, col, row + i, col - k, row + i + 1, col - k - 1)) {
+                                    moveList.add(new CheckersMove(row, col, row + i + 1, col - k - 1));
+                                }
+                            }
+                        }
+                    }
+                    queenMoveFields.clear();
+                    for (int i = 1; i < 8; i++) {
+                        for (int k = 1; k < 8; k++) {
+                            if (i == k) {
+                                if (row - i - 1 >= 0 & col - k - 1 >= 0)
+                                    queenMoveFields.put(row - i - 1, col - k - 1);
+                                if (canJump(player, row, col, row - i, col - k, row - i - 1, col - k - 1)) {
+                                    moveList.add(new CheckersMove(row, col, row - i - 1, col - k - 1));
+                                }
+                            }
+                        }
+                    }
+                    queenMoveFields.clear();
+                    System.out.println("Skoki" + moveList);
+                }
             }
         }
         if (moveList.size() == 0) {
             for (int row = 0; row < 8; row++) {
                 for (int col = 0; col < 8; col++) {
-                    if (board[row][col] == player || board[row][col] == playerQueen) {
+                    if (board[row][col] == player) {
                         if (canMove(player, row, col, row + 1, col + 1))
                             moveList.add(new CheckersMove(row, col, row + 1, col + 1));
                         if (canMove(player, row, col, row - 1, col + 1))
@@ -140,17 +246,57 @@ public class CheckersData {
                         if (canMove(player, row, col, row - 1, col - 1))
                             moveList.add(new CheckersMove(row, col, row - 1, col - 1));
                     }
-                    //próba zrobienia osobnej logiki dla królowej, która morze chodzić po czym chce, co jest czarnym polem
-                    //dosyć prymitywna i nie udało mi się jej rozwinąć, ale zostawiam poglądowo.
-                    //if (board[row][col] == playerQueen) {
-                    //    for (int i = 0; i < 8; i++) {
-                    //        for (int k = 0; k < 8; k++) {
-                    //           if (canMove(player, row, col, i, k) & i % 2 != k % 2) {
-                    //                moveList.add(new CheckersMove(row, col, i, k));
-                    //            }
-                    //        }
-                    //    }
-                    //}
+                    if (board[row][col] == playerQueen) {
+                        for (int i = 1; i < 8; i++) {
+                            for (int k = 1; k < 8; k++) {
+                                if (i == k) {
+                                    if (row + i <= 7 & col + k <= 7)
+                                        queenMoveFields.put(row + i, col + k);
+                                    if (canMove(player, row, col, row + i, col + k)) {
+                                        moveList.add(new CheckersMove(row, col, row + i, col + k));
+                                    }
+                                }
+                            }
+                        }
+                        queenMoveFields.clear();
+                        for (int i = 1; i < 8; i++) {
+                            for (int k = 1; k < 8; k++) {
+                                if (i == k) {
+                                    if (row - i >= 0 & col + k <= 7)
+                                        queenMoveFields.put(row - i, col + k);
+                                    if (canMove(player, row, col, row - i, col + k)) {
+                                        moveList.add(new CheckersMove(row, col, row - i, col + k));
+                                    }
+                                }
+                            }
+                        }
+                        queenMoveFields.clear();
+                        for (int i = 1; i < 8; i++) {
+                            for (int k = 1; k < 8; k++) {
+                                if (i == k) {
+                                    if (row + i <= 7 & col - k >= 0)
+                                        queenMoveFields.put(row + i, col - k);
+                                    if (canMove(player, row, col, row + i, col - k)) {
+                                        moveList.add(new CheckersMove(row, col, row + i, col - k));
+                                    }
+                                }
+                            }
+                        }
+                        queenMoveFields.clear();
+                        for (int i = 1; i < 8; i++) {
+                            for (int k = 1; k < 8; k++) {
+                                if (i == k) {
+                                    if (row - i >= 0 & col - k >= 0)
+                                        queenMoveFields.put(row - i, col - k);
+                                    if (canMove(player, row, col, row - i, col - k)) {
+                                        moveList.add(new CheckersMove(row, col, row - i, col - k));
+                                    }
+                                }
+                            }
+                        }
+                        queenMoveFields.clear();
+                        System.out.println("Ruchy" + moveList);
+                    }
                 }
             }
         }
@@ -172,7 +318,7 @@ public class CheckersData {
             playerQueen = BLACK_QUEEN;
 
         ArrayList<CheckersMove> jumpList = new ArrayList<>();
-        if (board[row][col] == player || board[row][col] == playerQueen) {
+        if (board[row][col] == player) {
             if (canJump(player, row, col, row + 1, col + 1, row + 2, col + 2))
                 jumpList.add(new CheckersMove(row, col, row + 2, col + 2));
             if (canJump(player, row, col, row - 1, col + 1, row - 2, col + 2))
@@ -181,6 +327,56 @@ public class CheckersData {
                 jumpList.add(new CheckersMove(row, col, row + 2, col - 2));
             if (canJump(player, row, col, row - 1, col - 1, row - 2, col - 2))
                 jumpList.add(new CheckersMove(row, col, row - 2, col - 2));
+        }
+        if (board[row][col] == playerQueen) {
+            for (int i = 1; i < 8; i++) {
+                for (int k = 1; k < 8; k++) {
+                    if (i == k) {
+                        if (row + i + 1 <= 7 & col + k + 1 <= 7)
+                            queenMoveFields.put(row + i + 1, col + k + 1);
+                        if (canJump(player, row, col, row + i, col + k, row + i + 1, col + k + 1)) {
+                            jumpList.add(new CheckersMove(row, col, row + i + 1, col + k + 1));
+                        }
+                    }
+                }
+            }
+            queenMoveFields.clear();
+            for (int i = 1; i < 8; i++) {
+                for (int k = 1; k < 8; k++) {
+                    if (i == k) {
+                        if (row - i - 1 >= 0 & col + k + 1 <= 7)
+                            queenMoveFields.put(row - i - 1, col + k + 1);
+                        if (canJump(player, row, col, row - i, col + k, row - i - 1, col + k + 1)) {
+                            jumpList.add(new CheckersMove(row, col, row - i - 1, col + k + 1));
+                        }
+                    }
+                }
+            }
+            queenMoveFields.clear();
+            for (int i = 1; i < 8; i++) {
+                for (int k = 1; k < 8; k++) {
+                    if (i == k) {
+                        if (row + i + 1 <= 7 & col - k - 1 >= 0)
+                            queenMoveFields.put(row + i + 1, col - k - 1);
+                        if (canJump(player, row, col, row + i, col - k, row + i + 1, col - k - 1)) {
+                            jumpList.add(new CheckersMove(row, col, row + i + 1, col - k - 1));
+                        }
+                    }
+                }
+            }
+            queenMoveFields.clear();
+            for (int i = 1; i < 8; i++) {
+                for (int k = 1; k < 8; k++) {
+                    if (i == k) {
+                        if (row - i - 1 >= 0 & col - k - 1 >= 0)
+                            queenMoveFields.put(row - i - 1, col - k - 1);
+                        if (canJump(player, row, col, row - i, col - k, row - i - 1, col - k - 1)) {
+                            jumpList.add(new CheckersMove(row, col, row - i - 1, col - k - 1));
+                        }
+                    }
+                }
+            }
+            queenMoveFields.clear();
         }
         if (jumpList.size() == 0)
             return null;
