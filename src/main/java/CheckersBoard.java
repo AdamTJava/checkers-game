@@ -18,6 +18,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class CheckersBoard extends Canvas {
@@ -41,6 +43,7 @@ public class CheckersBoard extends Canvas {
     Label computerScores;
     Label playerScores;
     Label scores;
+    ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
 
     public CheckersBoard() {
 
@@ -283,7 +286,7 @@ public class CheckersBoard extends Canvas {
         gameInProgress = false;
     }
 
-    public void doMakeMove(CheckersMove move) throws InterruptedException {
+    public void doMakeMove(CheckersMove move) {
 
         checkersData.makeMove(move);
         refreshBoard();
@@ -311,7 +314,7 @@ public class CheckersBoard extends Canvas {
                     board.setStroke(Color.RED);
                     board.setLineWidth(4);
                     board.strokeRect(5 + selectedCol * 100, 5 + selectedRow * 100, 96, 96);
-                    computerMove();
+                        computerMove();
                     return;
                 }
             }
@@ -337,26 +340,23 @@ public class CheckersBoard extends Canvas {
                 gameOver("RED has no moves.\nBLACK wins.\n\nClick \"New Game\" to play again.");
                 playersPoints++;
             } else {
-                computerMove();
-                refreshBoard();
-                computerMove();
+                    computerSelectPawn();
+                //executorService.schedule(this::computerMove, 1, TimeUnit.SECONDS);
+                //executorService.shutdown();
+                try {
+                    Thread.sleep(1000);
+                } catch (Exception e) {
+                    System.out.println("Error");
+                }
+                    computerMove();
             }
         }
-
-        refreshBoard();
-
     }
 
-    public void computerMove() throws InterruptedException {
+    public void computerSelectPawn() {
 
         GraphicsContext board = canvas.getGraphicsContext2D();
         Random random = new Random();
-
-        try {
-            TimeUnit.SECONDS.sleep(1);
-        } catch (InterruptedException e) {
-            System.out.println("Error");
-        }
 
         if (selectedRow == -1 & selectedCol == -1) {
             for (int k = 0; k < 999999; k++) {
@@ -375,20 +375,30 @@ public class CheckersBoard extends Canvas {
                     }
                 }
             }
-        } else {
-            for (int k = 0; k < 999999; k++) {
-                int randomToRow = random.nextInt(8);
-                int randomToCol = random.nextInt(8);
-                for (int i = 0; i < legalMoves.size(); i++) {
-                    if (randomToRow % 2 != randomToCol % 2 & checkersData.pieceAt(randomToRow, randomToCol) == CheckersData.EMPTY &
-                            legalMoves.get(i).fromRow == selectedRow & legalMoves.get(i).fromCol == selectedCol &
-                            legalMoves.get(i).toRow == randomToRow & legalMoves.get(i).toCol == randomToCol) {
+        }
+    }
+
+    public void computerMove() {
+
+        Random random = new Random();
+
+        for (int k = 0; k < 999999; k++) {
+            int randomToRow = random.nextInt(8);
+            int randomToCol = random.nextInt(8);
+            for (int i = 0; i < legalMoves.size(); i++) {
+                if (randomToRow % 2 != randomToCol % 2 & checkersData.pieceAt(randomToRow, randomToCol) == CheckersData.EMPTY &
+                        legalMoves.get(i).fromRow == selectedRow & legalMoves.get(i).fromCol == selectedCol &
+                        legalMoves.get(i).toRow == randomToRow & legalMoves.get(i).toCol == randomToCol) {
+                    try {
                         doMakeMove(legalMoves.get(i));
-                        return;
+                    } catch (Exception e) {
+                        e.fillInStackTrace();
                     }
+                    return;
                 }
             }
         }
+
     }
 
     public void clickSquare(int row, int col) {
@@ -401,17 +411,14 @@ public class CheckersBoard extends Canvas {
                 board.setStroke(Color.GREEN);
                 board.setLineWidth(4);
                 board.strokeRect(5 + col * 100, 5 + row * 100, 96, 96);
+                return;
             }
         }
 
         for (int i = 0; i < legalMoves.size(); i++) {
             if (legalMoves.get(i).fromRow == selectedRow & legalMoves.get(i).fromCol == selectedCol
                     & legalMoves.get(i).toRow == row & legalMoves.get(i).toCol == col) {
-                try {
-                    doMakeMove(legalMoves.get(i));
-                } catch (InterruptedException e) {
-                    System.out.println("Error");
-                }
+                doMakeMove(legalMoves.get(i));
                 return;
             }
         }
@@ -419,7 +426,7 @@ public class CheckersBoard extends Canvas {
 
     public void mousePressed(MouseEvent evt) {
         refreshBoard();
-        if (gameInProgress) {
+        if (gameInProgress & currentPlayer == CheckersData.BLACK) {
             int col = (int) (((evt.getX() - 81) / 100));
             int row = (int) ((evt.getY() - 23) / 100);
             if (col >= 0 & col < 8 & row >= 0 & row < 8) {

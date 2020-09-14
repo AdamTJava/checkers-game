@@ -14,6 +14,13 @@ public class CheckersData {
 
     public static int[][] board;
     Map<Integer, Integer> queenMoveFields;
+    public boolean queenBlockMove = false;
+    public Integer queenJumpRowToErase = 0;
+    public Integer queenJumpColToErase = 0;
+
+    public void setQueenBlockMove(boolean queenBlockMove) {
+        this.queenBlockMove = queenBlockMove;
+    }
 
     public CheckersData() {
         board = new int[8][8];
@@ -45,7 +52,10 @@ public class CheckersData {
             return false;
         if (board[rowFrom][colFrom] == BLACK_QUEEN || board[rowFrom][colFrom] == RED_QUEEN) {
             for (Map.Entry<Integer, Integer> eachField : queenMoveFields.entrySet()) {
-                if (board[eachField.getKey()][eachField.getValue()] != EMPTY) {
+                if (board[eachField.getKey()][eachField.getValue()] == EMPTY) {
+                    return true;
+                } else {
+                    setQueenBlockMove(true);
                     return false;
                 }
             }
@@ -68,32 +78,54 @@ public class CheckersData {
     }
 
     private boolean canJump(int player, int rowFrom, int colFrom, int rowMiddle, int colMiddle, int rowTo, int colTo) {
-        if (rowTo < 0 || rowTo > 7 || colTo < 0 || colTo > 7)
-            return false;
-        if (board[rowTo][colTo] != EMPTY)
-            return false;
-        if (player == RED) {
-            if (board[rowFrom][colFrom] == RED_QUEEN) {
-                for (Map.Entry<Integer, Integer> eachField : queenMoveFields.entrySet()) {
-                    if (board[eachField.getKey()][eachField.getValue()] == EMPTY & (board[rowMiddle][colMiddle] == BLACK ||
-                            board[rowMiddle][colMiddle] == BLACK_QUEEN)) {
-                        return true;
-                    }
-                    if (board[eachField.getKey()][eachField.getValue()] == EMPTY & board[rowMiddle][colMiddle] == EMPTY) {
-                        return false;
-                    }
-                    if (board[eachField.getKey()][eachField.getValue()] == RED || board[eachField.getKey()][eachField.getValue()] == RED_QUEEN ||
-                            board[rowMiddle][colMiddle] == RED || board[rowMiddle][colMiddle] == RED_QUEEN) {
-                        return false;
-                    }
-                    if ((board[eachField.getKey()][eachField.getValue()] == BLACK || board[eachField.getKey()][eachField.getValue()] == BLACK_QUEEN) &
-                            (board[rowMiddle][colMiddle] == BLACK || board[rowMiddle][colMiddle] == BLACK_QUEEN)) {
-                        return false;
-                    } else {
-                        return true;
-                    }
+
+        if (board[rowFrom][colFrom] == RED_QUEEN) {
+            for (Map.Entry<Integer, Integer> eachField : queenMoveFields.entrySet()) {
+                if (board[eachField.getKey()][eachField.getValue()] == EMPTY & (board[rowMiddle][colMiddle] == BLACK ||
+                        board[rowMiddle][colMiddle] == BLACK_QUEEN)) {
+                    return true;
+                }
+                if (board[eachField.getKey()][eachField.getValue()] == RED || board[eachField.getKey()][eachField.getValue()] == RED_QUEEN ||
+                        board[rowMiddle][colMiddle] == RED || board[rowMiddle][colMiddle] == RED_QUEEN) {
+                    setQueenBlockMove(true);
+                    return false;
+                }
+                if ((board[eachField.getKey()][eachField.getValue()] == BLACK || board[eachField.getKey()][eachField.getValue()] == BLACK_QUEEN) &
+                        (board[rowMiddle][colMiddle] == BLACK || board[rowMiddle][colMiddle] == BLACK_QUEEN)) {
+                    setQueenBlockMove(true);
+                    return false;
                 }
             }
+        }
+
+        if (board[rowFrom][colFrom] == BLACK_QUEEN) {
+            for (Map.Entry<Integer, Integer> eachField : queenMoveFields.entrySet()) {
+                if (board[eachField.getKey()][eachField.getValue()] == EMPTY & (board[rowMiddle][colMiddle] == RED ||
+                        board[rowMiddle][colMiddle] == RED_QUEEN)) {
+                    queenJumpRowToErase = rowMiddle;
+                    queenJumpColToErase = colMiddle;
+                    return true;
+                }
+                if (board[eachField.getKey()][eachField.getValue()] == BLACK || board[eachField.getKey()][eachField.getValue()] == BLACK_QUEEN ||
+                        board[rowMiddle][colMiddle] == BLACK || board[rowMiddle][colMiddle] == BLACK_QUEEN) {
+                    setQueenBlockMove(true);
+                    return false;
+                }
+                if ((board[eachField.getKey()][eachField.getValue()] == RED || board[eachField.getKey()][eachField.getValue()] == RED_QUEEN) &
+                        (board[rowMiddle][colMiddle] == RED || board[rowMiddle][colMiddle] == RED_QUEEN)) {
+                    setQueenBlockMove(true);
+                    return false;
+                }
+            }
+        }
+
+        if (rowTo < 0 || rowTo > 7 || colTo < 0 || colTo > 7)
+            return false;
+
+        if (board[rowTo][colTo] != EMPTY)
+            return false;
+
+        if (player == RED) {
             if (board[rowFrom][colFrom] == RED & rowTo < rowFrom) {
                 return false;
             } else if (board[rowMiddle][colMiddle] != BLACK & board[rowMiddle][colMiddle] != BLACK_QUEEN) {
@@ -102,27 +134,6 @@ public class CheckersData {
                 return true;
             }
         } else {
-            if (board[rowFrom][colFrom] == BLACK_QUEEN) {
-                for (Map.Entry<Integer, Integer> eachField : queenMoveFields.entrySet()) {
-                    if (board[eachField.getKey()][eachField.getValue()] == EMPTY & (board[rowMiddle][colMiddle] == RED ||
-                            board[rowMiddle][colMiddle] == RED_QUEEN)) {
-                        return true;
-                    }
-                    if (board[eachField.getKey()][eachField.getValue()] == EMPTY & board[rowMiddle][colMiddle] == EMPTY) {
-                        return false;
-                    }
-                    if (board[eachField.getKey()][eachField.getValue()] == BLACK || board[eachField.getKey()][eachField.getValue()] == BLACK_QUEEN ||
-                            board[rowMiddle][colMiddle] == BLACK || board[rowMiddle][colMiddle] == BLACK_QUEEN) {
-                        return false;
-                    }
-                    if ((board[eachField.getKey()][eachField.getValue()] == RED || board[eachField.getKey()][eachField.getValue()] == RED_QUEEN) &
-                            (board[rowMiddle][colMiddle] == RED || board[rowMiddle][colMiddle] == RED_QUEEN)) {
-                        return false;
-                    } else {
-                        return true;
-                    }
-                }
-            }
             if (board[rowFrom][colFrom] == BLACK & rowTo > rowFrom) {
                 return false;
             } else if (board[rowMiddle][colMiddle] != RED & board[rowMiddle][colMiddle] != RED_QUEEN) {
@@ -134,6 +145,16 @@ public class CheckersData {
     }
 
     public void makeMove(CheckersMove move) {
+
+        if (board[move.fromRow][move.fromCol] != EMPTY & (board[move.fromRow][move.fromCol] == BLACK_QUEEN || board[move.fromRow][move.fromCol] == RED_QUEEN)) {
+            board[move.toRow][move.toCol] = board[move.fromRow][move.fromCol];
+            board[move.fromRow][move.fromCol] = EMPTY;
+            for (Map.Entry<Integer, Integer> fieldToErase : move.getFieldToErase().entrySet()) {
+                board[fieldToErase.getKey()][fieldToErase.getValue()] = EMPTY;
+            }
+            queenJumpRowToErase = 0;
+            queenJumpColToErase = 0;
+        }
 
         if (board[move.fromRow][move.fromCol] != EMPTY) {
             board[move.toRow][move.toCol] = board[move.fromRow][move.fromCol];
@@ -183,53 +204,64 @@ public class CheckersData {
                 if (board[row][col] == playerQueen) {
                     for (int i = 1; i < 8; i++) {
                         for (int k = 1; k < 8; k++) {
-                            if (i == k) {
+                            if (i == k & !queenBlockMove) {
                                 if (row + i + 1 <= 7 & col + k + 1 <= 7)
                                     queenMoveFields.put(row + i + 1, col + k + 1);
                                 if (canJump(player, row, col, row + i, col + k, row + i + 1, col + k + 1)) {
-                                    moveList.add(new CheckersMove(row, col, row + i + 1, col + k + 1));
+                                    CheckersMove queenMove = new CheckersMove(row, col, row + i + 1, col + k + 1);
+                                    moveList.add(queenMove);
+                                    queenMove.setFieldToErase(queenJumpRowToErase, queenJumpColToErase);
                                 }
+                                queenMoveFields.clear();
                             }
                         }
                     }
-                    queenMoveFields.clear();
+                    setQueenBlockMove(false);
                     for (int i = 1; i < 8; i++) {
                         for (int k = 1; k < 8; k++) {
-                            if (i == k) {
+                            if (i == k & !queenBlockMove) {
                                 if (row - i - 1 >= 0 & col + k + 1 <= 7)
                                     queenMoveFields.put(row - i - 1, col + k + 1);
                                 if (canJump(player, row, col, row - i, col + k, row - i - 1, col + k + 1)) {
-                                    moveList.add(new CheckersMove(row, col, row - i - 1, col + k + 1));
+                                    CheckersMove queenMove = new CheckersMove(row, col, row - i - 1, col + k + 1);
+                                    moveList.add(queenMove);
+                                    queenMove.setFieldToErase(queenJumpRowToErase, queenJumpColToErase);
                                 }
+                                queenMoveFields.clear();
                             }
                         }
                     }
-                    queenMoveFields.clear();
+                    setQueenBlockMove(false);
                     for (int i = 1; i < 8; i++) {
                         for (int k = 1; k < 8; k++) {
-                            if (i == k) {
+                            if (i == k & !queenBlockMove) {
                                 if (row + i + 1 <= 7 & col - k - 1 >= 0)
                                     queenMoveFields.put(row + i + 1, col - k - 1);
                                 if (canJump(player, row, col, row + i, col - k, row + i + 1, col - k - 1)) {
-                                    moveList.add(new CheckersMove(row, col, row + i + 1, col - k - 1));
+                                    CheckersMove queenMove = new CheckersMove(row, col, row + i + 1, col - k - 1);
+                                    moveList.add(queenMove);
+                                    queenMove.setFieldToErase(queenJumpRowToErase, queenJumpColToErase);
                                 }
+                                queenMoveFields.clear();
                             }
                         }
                     }
-                    queenMoveFields.clear();
+                    setQueenBlockMove(false);
                     for (int i = 1; i < 8; i++) {
                         for (int k = 1; k < 8; k++) {
-                            if (i == k) {
+                            if (i == k & !queenBlockMove) {
                                 if (row - i - 1 >= 0 & col - k - 1 >= 0)
                                     queenMoveFields.put(row - i - 1, col - k - 1);
                                 if (canJump(player, row, col, row - i, col - k, row - i - 1, col - k - 1)) {
-                                    moveList.add(new CheckersMove(row, col, row - i - 1, col - k - 1));
+                                    CheckersMove queenMove = new CheckersMove(row, col, row - i - 1, col - k - 1);
+                                    moveList.add(queenMove);
+                                    queenMove.setFieldToErase(queenJumpRowToErase, queenJumpColToErase);
                                 }
+                                queenMoveFields.clear();
                             }
                         }
                     }
-                    queenMoveFields.clear();
-                    System.out.println("Skoki" + moveList);
+                    setQueenBlockMove(false);
                 }
             }
         }
@@ -249,53 +281,56 @@ public class CheckersData {
                     if (board[row][col] == playerQueen) {
                         for (int i = 1; i < 8; i++) {
                             for (int k = 1; k < 8; k++) {
-                                if (i == k) {
+                                if (i == k & !queenBlockMove) {
                                     if (row + i <= 7 & col + k <= 7)
                                         queenMoveFields.put(row + i, col + k);
                                     if (canMove(player, row, col, row + i, col + k)) {
                                         moveList.add(new CheckersMove(row, col, row + i, col + k));
                                     }
+                                    queenMoveFields.clear();
                                 }
                             }
                         }
-                        queenMoveFields.clear();
+                        setQueenBlockMove(false);
                         for (int i = 1; i < 8; i++) {
                             for (int k = 1; k < 8; k++) {
-                                if (i == k) {
+                                if (i == k & !queenBlockMove) {
                                     if (row - i >= 0 & col + k <= 7)
                                         queenMoveFields.put(row - i, col + k);
                                     if (canMove(player, row, col, row - i, col + k)) {
                                         moveList.add(new CheckersMove(row, col, row - i, col + k));
                                     }
+                                    queenMoveFields.clear();
                                 }
                             }
                         }
-                        queenMoveFields.clear();
+                        setQueenBlockMove(false);
                         for (int i = 1; i < 8; i++) {
                             for (int k = 1; k < 8; k++) {
-                                if (i == k) {
+                                if (i == k & !queenBlockMove) {
                                     if (row + i <= 7 & col - k >= 0)
                                         queenMoveFields.put(row + i, col - k);
                                     if (canMove(player, row, col, row + i, col - k)) {
                                         moveList.add(new CheckersMove(row, col, row + i, col - k));
                                     }
+                                    queenMoveFields.clear();
                                 }
                             }
                         }
-                        queenMoveFields.clear();
+                        setQueenBlockMove(false);
                         for (int i = 1; i < 8; i++) {
                             for (int k = 1; k < 8; k++) {
-                                if (i == k) {
+                                if (i == k & !queenBlockMove) {
                                     if (row - i >= 0 & col - k >= 0)
                                         queenMoveFields.put(row - i, col - k);
                                     if (canMove(player, row, col, row - i, col - k)) {
                                         moveList.add(new CheckersMove(row, col, row - i, col - k));
                                     }
+                                    queenMoveFields.clear();
                                 }
                             }
                         }
-                        queenMoveFields.clear();
-                        System.out.println("Ruchy" + moveList);
+                        setQueenBlockMove(false);
                     }
                 }
             }
@@ -331,52 +366,64 @@ public class CheckersData {
         if (board[row][col] == playerQueen) {
             for (int i = 1; i < 8; i++) {
                 for (int k = 1; k < 8; k++) {
-                    if (i == k) {
+                    if (i == k & !queenBlockMove) {
                         if (row + i + 1 <= 7 & col + k + 1 <= 7)
                             queenMoveFields.put(row + i + 1, col + k + 1);
                         if (canJump(player, row, col, row + i, col + k, row + i + 1, col + k + 1)) {
-                            jumpList.add(new CheckersMove(row, col, row + i + 1, col + k + 1));
+                            CheckersMove queenMove = new CheckersMove(row, col, row + i + 1, col + k + 1);
+                            jumpList.add(queenMove);
+                            queenMove.setFieldToErase(queenJumpRowToErase, queenJumpColToErase);
                         }
+                        queenMoveFields.clear();
                     }
                 }
             }
-            queenMoveFields.clear();
+            setQueenBlockMove(false);
             for (int i = 1; i < 8; i++) {
                 for (int k = 1; k < 8; k++) {
-                    if (i == k) {
+                    if (i == k & !queenBlockMove) {
                         if (row - i - 1 >= 0 & col + k + 1 <= 7)
                             queenMoveFields.put(row - i - 1, col + k + 1);
                         if (canJump(player, row, col, row - i, col + k, row - i - 1, col + k + 1)) {
-                            jumpList.add(new CheckersMove(row, col, row - i - 1, col + k + 1));
+                            CheckersMove queenMove = new CheckersMove(row, col, row - i - 1, col + k + 1);
+                            jumpList.add(queenMove);
+                            queenMove.setFieldToErase(queenJumpRowToErase, queenJumpColToErase);
                         }
+                        queenMoveFields.clear();
                     }
                 }
             }
-            queenMoveFields.clear();
+            setQueenBlockMove(false);
             for (int i = 1; i < 8; i++) {
                 for (int k = 1; k < 8; k++) {
-                    if (i == k) {
+                    if (i == k & !queenBlockMove) {
                         if (row + i + 1 <= 7 & col - k - 1 >= 0)
                             queenMoveFields.put(row + i + 1, col - k - 1);
                         if (canJump(player, row, col, row + i, col - k, row + i + 1, col - k - 1)) {
-                            jumpList.add(new CheckersMove(row, col, row + i + 1, col - k - 1));
+                            CheckersMove queenMove = new CheckersMove(row, col, row + i + 1, col - k - 1);
+                            jumpList.add(queenMove);
+                            queenMove.setFieldToErase(queenJumpRowToErase, queenJumpColToErase);
                         }
+                        queenMoveFields.clear();
                     }
                 }
             }
-            queenMoveFields.clear();
+            setQueenBlockMove(false);
             for (int i = 1; i < 8; i++) {
                 for (int k = 1; k < 8; k++) {
-                    if (i == k) {
+                    if (i == k & !queenBlockMove) {
                         if (row - i - 1 >= 0 & col - k - 1 >= 0)
                             queenMoveFields.put(row - i - 1, col - k - 1);
                         if (canJump(player, row, col, row - i, col - k, row - i - 1, col - k - 1)) {
-                            jumpList.add(new CheckersMove(row, col, row - i - 1, col - k - 1));
+                            CheckersMove queenMove = new CheckersMove(row, col, row - i - 1, col - k - 1);
+                            jumpList.add(queenMove);
+                            queenMove.setFieldToErase(queenJumpRowToErase, queenJumpColToErase);
                         }
+                        queenMoveFields.clear();
                     }
                 }
             }
-            queenMoveFields.clear();
+            setQueenBlockMove(false);
         }
         if (jumpList.size() == 0)
             return null;
