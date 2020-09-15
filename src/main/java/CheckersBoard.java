@@ -1,3 +1,5 @@
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
@@ -13,6 +15,7 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
+import javafx.util.Duration;
 
 import java.util.Arrays;
 import java.util.List;
@@ -43,7 +46,9 @@ public class CheckersBoard extends Canvas {
     Label computerScores;
     Label playerScores;
     Label scores;
-    ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+    final KeyFrame kf1 = new KeyFrame(Duration.seconds(1), e -> computerSelectPawn());
+    final KeyFrame kf2 = new KeyFrame(Duration.seconds(2), e -> computerMove());
+    final Timeline timeline = new Timeline(kf1, kf2);
 
     public CheckersBoard() {
 
@@ -340,15 +345,7 @@ public class CheckersBoard extends Canvas {
                 gameOver("RED has no moves.\nBLACK wins.\n\nClick \"New Game\" to play again.");
                 playersPoints++;
             } else {
-                    computerSelectPawn();
-                //executorService.schedule(this::computerMove, 1, TimeUnit.SECONDS);
-                //executorService.shutdown();
-                try {
-                    Thread.sleep(1000);
-                } catch (Exception e) {
-                    System.out.println("Error");
-                }
-                    computerMove();
+                    Platform.runLater(timeline::play);
             }
         }
     }
