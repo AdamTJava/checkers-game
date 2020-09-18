@@ -3,6 +3,7 @@ import java.util.Map;
 
 public class CheckersMove {
 
+    String name;
     int fromRow;
     int fromCol;
     int toRow;
