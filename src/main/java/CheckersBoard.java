@@ -256,6 +256,7 @@ public class CheckersBoard extends Canvas {
     public void startNewGame() {
 
         newGameButton.setDisable(true);
+        restartGameButton.setDisable(false);
         checkersData.prepareGameData();
         currentPlayer = CheckersData.BLACK;
         message.setText("Player - BLACK\nComputer - RED\n\nPlayer starts, make Your move.");

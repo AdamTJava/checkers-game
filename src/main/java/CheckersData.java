@@ -80,12 +80,17 @@ public class CheckersData {
     private boolean canJump(int player, int rowFrom, int colFrom, int rowMiddle, int colMiddle, int rowTo, int colTo) {
 
         if (board[rowFrom][colFrom] == RED_QUEEN) {
+
+            if (board[rowMiddle][colMiddle] == EMPTY)
+                return false;
+
             for (Map.Entry<Integer, Integer> eachField : queenMoveFields.entrySet()) {
                 if (board[eachField.getKey()][eachField.getValue()] == EMPTY & (board[rowMiddle][colMiddle] == BLACK ||
                         board[rowMiddle][colMiddle] == BLACK_QUEEN)) {
                     return true;
                 }
-                if (board[rowMiddle][colMiddle] == RED || board[rowMiddle][colMiddle] == RED_QUEEN) {
+                if (board[rowMiddle][colMiddle] == RED || board[rowMiddle][colMiddle] == RED_QUEEN || board[eachField.getKey()][eachField.getValue()] == RED ||
+                        board[eachField.getKey()][eachField.getValue()] == RED_QUEEN) {
                     setQueenBlockMove(true);
                     return false;
                 }
@@ -98,6 +103,10 @@ public class CheckersData {
         }
 
         if (board[rowFrom][colFrom] == BLACK_QUEEN) {
+
+            if (board[rowMiddle][colMiddle] == EMPTY)
+                return false;
+
             for (Map.Entry<Integer, Integer> eachField : queenMoveFields.entrySet()) {
                 if (board[eachField.getKey()][eachField.getValue()] == EMPTY & (board[rowMiddle][colMiddle] == RED ||
                         board[rowMiddle][colMiddle] == RED_QUEEN)) {
@@ -105,7 +114,8 @@ public class CheckersData {
                     queenJumpColToErase = colMiddle;
                     return true;
                 }
-                if (board[rowMiddle][colMiddle] == BLACK || board[rowMiddle][colMiddle] == BLACK_QUEEN) {
+                if (board[rowMiddle][colMiddle] == BLACK || board[rowMiddle][colMiddle] == BLACK_QUEEN || board[eachField.getKey()][eachField.getValue()] == BLACK ||
+                        board[eachField.getKey()][eachField.getValue()] == BLACK_QUEEN) {
                     setQueenBlockMove(true);
                     return false;
                 }
