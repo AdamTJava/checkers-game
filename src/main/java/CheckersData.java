@@ -81,8 +81,9 @@ public class CheckersData {
 
         if (board[rowFrom][colFrom] == RED_QUEEN) {
 
-            if (board[rowMiddle][colMiddle] == EMPTY)
+            if (board[rowMiddle][colMiddle] == EMPTY) {
                 return false;
+            }
 
             for (Map.Entry<Integer, Integer> eachField : queenMoveFields.entrySet()) {
                 if (board[eachField.getKey()][eachField.getValue()] == EMPTY & (board[rowMiddle][colMiddle] == BLACK ||
@@ -104,8 +105,9 @@ public class CheckersData {
 
         if (board[rowFrom][colFrom] == BLACK_QUEEN) {
 
-            if (board[rowMiddle][colMiddle] == EMPTY)
+            if (board[rowMiddle][colMiddle] == EMPTY) {
                 return false;
+            }
 
             for (Map.Entry<Integer, Integer> eachField : queenMoveFields.entrySet()) {
                 if (board[eachField.getKey()][eachField.getValue()] == EMPTY & (board[rowMiddle][colMiddle] == RED ||
@@ -210,86 +212,10 @@ public class CheckersData {
                         moveList.add(new CheckersMove(row, col, row - 2, col - 2));
                 }
                 if (board[row][col] == playerQueen) {
-                    for (int i = 1; i < 8; i++) {
-                        for (int k = 1; k < 8; k++) {
-                            if (i == k & !queenBlockMove) {
-                                for (int m = 1; m < 8; m++) {
-                                    for (int n = 1; n < 8; n++) {
-                                        if (m == n & !queenBlockMove & row + i + m <= 7 & col + k + n <= 7) {
-                                            queenMoveFields.put(row + i + m, col + k + n);
-                                            if (canJump(player, row, col, row + i, col + k, row + i + m, col + k + n)) {
-                                                CheckersMove queenMove = new CheckersMove(row, col, row + i + m, col + k + n);
-                                                moveList.add(queenMove);
-                                                queenMove.setFieldToErase(queenJumpRowToErase, queenJumpColToErase);
-                                            }
-                                            queenMoveFields.clear();
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    setQueenBlockMove(false);
-                    for (int i = 1; i < 8; i++) {
-                        for (int k = 1; k < 8; k++) {
-                            if (i == k & !queenBlockMove) {
-                                for (int m = 1; m < 8; m++) {
-                                    for (int n = 1; n < 8; n++) {
-                                        if (m == n & !queenBlockMove & row - i - m >= 0 & col + k + n <= 7) {
-                                            queenMoveFields.put(row - i - m, col + k + n);
-                                            if (canJump(player, row, col, row - i, col + k, row - i - m, col + k + n)) {
-                                                CheckersMove queenMove = new CheckersMove(row, col, row - i - m, col + k + n);
-                                                moveList.add(queenMove);
-                                                queenMove.setFieldToErase(queenJumpRowToErase, queenJumpColToErase);
-                                            }
-                                            queenMoveFields.clear();
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    setQueenBlockMove(false);
-                    for (int i = 1; i < 8; i++) {
-                        for (int k = 1; k < 8; k++) {
-                            if (i == k & !queenBlockMove) {
-                                for (int m = 1; m < 8; m++) {
-                                    for (int n = 1; n < 8; n++) {
-                                        if (m == n & !queenBlockMove & row + i + m <= 7 & col - k - n >= 0) {
-                                            queenMoveFields.put(row + i + m, col - k - n);
-                                            if (canJump(player, row, col, row + i, col - k, row + i + m, col - k - n)) {
-                                                CheckersMove queenMove = new CheckersMove(row, col, row + i + m, col - k - n);
-                                                moveList.add(queenMove);
-                                                queenMove.setFieldToErase(queenJumpRowToErase, queenJumpColToErase);
-                                            }
-                                            queenMoveFields.clear();
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    setQueenBlockMove(false);
-                    for (int i = 1; i < 8; i++) {
-                        for (int k = 1; k < 8; k++) {
-                            if (i == k & !queenBlockMove) {
-                                for (int m = 1; m < 8; m++) {
-                                    for (int n = 1; n < 8; n++) {
-                                        if (m == n & !queenBlockMove & row - i - m >= 0 & col - k - n >= 0) {
-                                            queenMoveFields.put(row - i - m, col - k - n);
-                                            if (canJump(player, row, col, row - i, col - k, row - i - m, col - k - n)) {
-                                                CheckersMove queenMove = new CheckersMove(row, col, row - i - m, col - k - n);
-                                                moveList.add(queenMove);
-                                                queenMove.setFieldToErase(queenJumpRowToErase, queenJumpColToErase);
-                                            }
-                                            queenMoveFields.clear();
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    setQueenBlockMove(false);
+                    checkEachFieldDownRightForQueenJump(player, moveList, row, col);
+                    checkEachFieldUpRightForQueenJump(player, moveList, row, col);
+                    checkEachFieldDownLeftForQueenJump(player, moveList, row, col);
+                    checkEachFieldUpLeftForQueenJump(player, moveList, row, col);
                 }
             }
         }
@@ -307,58 +233,10 @@ public class CheckersData {
                             moveList.add(new CheckersMove(row, col, row - 1, col - 1));
                     }
                     if (board[row][col] == playerQueen) {
-                        for (int i = 1; i < 8; i++) {
-                            for (int k = 1; k < 8; k++) {
-                                if (i == k & !queenBlockMove) {
-                                    if (row + i <= 7 & col + k <= 7)
-                                        queenMoveFields.put(row + i, col + k);
-                                    if (canMove(player, row, col, row + i, col + k)) {
-                                        moveList.add(new CheckersMove(row, col, row + i, col + k));
-                                    }
-                                    queenMoveFields.clear();
-                                }
-                            }
-                        }
-                        setQueenBlockMove(false);
-                        for (int i = 1; i < 8; i++) {
-                            for (int k = 1; k < 8; k++) {
-                                if (i == k & !queenBlockMove) {
-                                    if (row - i >= 0 & col + k <= 7)
-                                        queenMoveFields.put(row - i, col + k);
-                                    if (canMove(player, row, col, row - i, col + k)) {
-                                        moveList.add(new CheckersMove(row, col, row - i, col + k));
-                                    }
-                                    queenMoveFields.clear();
-                                }
-                            }
-                        }
-                        setQueenBlockMove(false);
-                        for (int i = 1; i < 8; i++) {
-                            for (int k = 1; k < 8; k++) {
-                                if (i == k & !queenBlockMove) {
-                                    if (row + i <= 7 & col - k >= 0)
-                                        queenMoveFields.put(row + i, col - k);
-                                    if (canMove(player, row, col, row + i, col - k)) {
-                                        moveList.add(new CheckersMove(row, col, row + i, col - k));
-                                    }
-                                    queenMoveFields.clear();
-                                }
-                            }
-                        }
-                        setQueenBlockMove(false);
-                        for (int i = 1; i < 8; i++) {
-                            for (int k = 1; k < 8; k++) {
-                                if (i == k & !queenBlockMove) {
-                                    if (row - i >= 0 & col - k >= 0)
-                                        queenMoveFields.put(row - i, col - k);
-                                    if (canMove(player, row, col, row - i, col - k)) {
-                                        moveList.add(new CheckersMove(row, col, row - i, col - k));
-                                    }
-                                    queenMoveFields.clear();
-                                }
-                            }
-                        }
-                        setQueenBlockMove(false);
+                        checkEachFieldDownRightForQueenMove(player, moveList, row, col);
+                        checkEachFieldUpRightForQueenMove(player, moveList, row, col);
+                        checkEachFieldDownLeftForQueenMove(player, moveList, row, col);
+                        checkEachFieldUpLeftForQueenMove(player, moveList, row, col);
                     }
                 }
             }
@@ -368,6 +246,162 @@ public class CheckersData {
         } else {
             return moveList;
         }
+    }
+
+    private void checkEachFieldUpLeftForQueenMove(int player, ArrayList<CheckersMove> moveList, int row, int col) {
+        for (int i = 1; i < 8; i++) {
+            for (int k = 1; k < 8; k++) {
+                if (i == k & !queenBlockMove) {
+                    if (row - i >= 0 & col - k >= 0)
+                        queenMoveFields.put(row - i, col - k);
+                    if (canMove(player, row, col, row - i, col - k)) {
+                        moveList.add(new CheckersMove(row, col, row - i, col - k));
+                    }
+                    queenMoveFields.clear();
+                }
+            }
+        }
+        setQueenBlockMove(false);
+    }
+
+    private void checkEachFieldDownLeftForQueenMove(int player, ArrayList<CheckersMove> moveList, int row, int col) {
+        for (int i = 1; i < 8; i++) {
+            for (int k = 1; k < 8; k++) {
+                if (i == k & !queenBlockMove) {
+                    if (row + i <= 7 & col - k >= 0)
+                        queenMoveFields.put(row + i, col - k);
+                    if (canMove(player, row, col, row + i, col - k)) {
+                        moveList.add(new CheckersMove(row, col, row + i, col - k));
+                    }
+                    queenMoveFields.clear();
+                }
+            }
+        }
+        setQueenBlockMove(false);
+    }
+
+    private void checkEachFieldUpRightForQueenMove(int player, ArrayList<CheckersMove> moveList, int row, int col) {
+        for (int i = 1; i < 8; i++) {
+            for (int k = 1; k < 8; k++) {
+                if (i == k & !queenBlockMove) {
+                    if (row - i >= 0 & col + k <= 7)
+                        queenMoveFields.put(row - i, col + k);
+                    if (canMove(player, row, col, row - i, col + k)) {
+                        moveList.add(new CheckersMove(row, col, row - i, col + k));
+                    }
+                    queenMoveFields.clear();
+                }
+            }
+        }
+        setQueenBlockMove(false);
+    }
+
+    private void checkEachFieldDownRightForQueenMove(int player, ArrayList<CheckersMove> moveList, int row, int col) {
+        for (int i = 1; i < 8; i++) {
+            for (int k = 1; k < 8; k++) {
+                if (i == k & !queenBlockMove) {
+                    if (row + i <= 7 & col + k <= 7)
+                        queenMoveFields.put(row + i, col + k);
+                    if (canMove(player, row, col, row + i, col + k)) {
+                        moveList.add(new CheckersMove(row, col, row + i, col + k));
+                    }
+                    queenMoveFields.clear();
+                }
+            }
+        }
+        setQueenBlockMove(false);
+    }
+
+    private void checkEachFieldUpLeftForQueenJump(int player, ArrayList<CheckersMove> moveList, int row, int col) {
+        for (int i = 1; i < 8; i++) {
+            for (int k = 1; k < 8; k++) {
+                if (i == k & !queenBlockMove) {
+                    for (int m = 1; m < 8; m++) {
+                        for (int n = 1; n < 8; n++) {
+                            if (m == n & !queenBlockMove & row - i - m >= 0 & col - k - n >= 0) {
+                                queenMoveFields.put(row - i - m, col - k - n);
+                                if (canJump(player, row, col, row - i, col - k, row - i - m, col - k - n)) {
+                                    CheckersMove queenMove = new CheckersMove(row, col, row - i - m, col - k - n);
+                                    moveList.add(queenMove);
+                                    queenMove.setFieldToErase(queenJumpRowToErase, queenJumpColToErase);
+                                }
+                                queenMoveFields.clear();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        setQueenBlockMove(false);
+    }
+
+    private void checkEachFieldDownLeftForQueenJump(int player, ArrayList<CheckersMove> moveList, int row, int col) {
+        for (int i = 1; i < 8; i++) {
+            for (int k = 1; k < 8; k++) {
+                if (i == k & !queenBlockMove) {
+                    for (int m = 1; m < 8; m++) {
+                        for (int n = 1; n < 8; n++) {
+                            if (m == n & !queenBlockMove & row + i + m <= 7 & col - k - n >= 0) {
+                                queenMoveFields.put(row + i + m, col - k - n);
+                                if (canJump(player, row, col, row + i, col - k, row + i + m, col - k - n)) {
+                                    CheckersMove queenMove = new CheckersMove(row, col, row + i + m, col - k - n);
+                                    moveList.add(queenMove);
+                                    queenMove.setFieldToErase(queenJumpRowToErase, queenJumpColToErase);
+                                }
+                                queenMoveFields.clear();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        setQueenBlockMove(false);
+    }
+
+    private void checkEachFieldUpRightForQueenJump(int player, ArrayList<CheckersMove> moveList, int row, int col) {
+        for (int i = 1; i < 8; i++) {
+            for (int k = 1; k < 8; k++) {
+                if (i == k & !queenBlockMove) {
+                    for (int m = 1; m < 8; m++) {
+                        for (int n = 1; n < 8; n++) {
+                            if (m == n & !queenBlockMove & row - i - m >= 0 & col + k + n <= 7) {
+                                queenMoveFields.put(row - i - m, col + k + n);
+                                if (canJump(player, row, col, row - i, col + k, row - i - m, col + k + n)) {
+                                    CheckersMove queenMove = new CheckersMove(row, col, row - i - m, col + k + n);
+                                    moveList.add(queenMove);
+                                    queenMove.setFieldToErase(queenJumpRowToErase, queenJumpColToErase);
+                                }
+                                queenMoveFields.clear();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        setQueenBlockMove(false);
+    }
+
+    private void checkEachFieldDownRightForQueenJump(int player, ArrayList<CheckersMove> moveList, int row, int col) {
+        for (int i = 1; i < 8; i++) {
+            for (int k = 1; k < 8; k++) {
+                if (i == k & !queenBlockMove) {
+                    for (int m = 1; m < 8; m++) {
+                        for (int n = 1; n < 8; n++) {
+                            if (m == n & !queenBlockMove & row + i + m <= 7 & col + k + n <= 7) {
+                                queenMoveFields.put(row + i + m, col + k + n);
+                                if (canJump(player, row, col, row + i, col + k, row + i + m, col + k + n)) {
+                                    CheckersMove queenMove = new CheckersMove(row, col, row + i + m, col + k + n);
+                                    moveList.add(queenMove);
+                                    queenMove.setFieldToErase(queenJumpRowToErase, queenJumpColToErase);
+                                }
+                                queenMoveFields.clear();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        setQueenBlockMove(false);
     }
 
     List<CheckersMove> getLegalJumpsFrom(int player, int row, int col) {
@@ -392,86 +426,10 @@ public class CheckersData {
                 jumpList.add(new CheckersMove(row, col, row - 2, col - 2));
         }
         if (board[row][col] == playerQueen) {
-            for (int i = 1; i < 8; i++) {
-                for (int k = 1; k < 8; k++) {
-                    if (i == k & !queenBlockMove) {
-                        for (int m = 1; m < 8; m++) {
-                            for (int n = 1; n < 8; n++) {
-                                if (m == n & !queenBlockMove & row + i + m <= 7 & col + k + n <= 7) {
-                                    queenMoveFields.put(row + i + m, col + k + n);
-                                    if (canJump(player, row, col, row + i, col + k, row + i + m, col + k + n)) {
-                                        CheckersMove queenMove = new CheckersMove(row, col, row + i + m, col + k + n);
-                                        jumpList.add(queenMove);
-                                        queenMove.setFieldToErase(queenJumpRowToErase, queenJumpColToErase);
-                                    }
-                                    queenMoveFields.clear();
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            setQueenBlockMove(false);
-            for (int i = 1; i < 8; i++) {
-                for (int k = 1; k < 8; k++) {
-                    if (i == k & !queenBlockMove) {
-                        for (int m = 1; m < 8; m++) {
-                            for (int n = 1; n < 8; n++) {
-                                if (m == n & !queenBlockMove & row - i - m >= 0 & col + k + n <= 7) {
-                                    queenMoveFields.put(row - i - m, col + k + n);
-                                    if (canJump(player, row, col, row - i, col + k, row - i - m, col + k + n)) {
-                                        CheckersMove queenMove = new CheckersMove(row, col, row - i - m, col + k + n);
-                                        jumpList.add(queenMove);
-                                        queenMove.setFieldToErase(queenJumpRowToErase, queenJumpColToErase);
-                                    }
-                                    queenMoveFields.clear();
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            setQueenBlockMove(false);
-            for (int i = 1; i < 8; i++) {
-                for (int k = 1; k < 8; k++) {
-                    if (i == k & !queenBlockMove) {
-                        for (int m = 1; m < 8; m++) {
-                            for (int n = 1; n < 8; n++) {
-                                if (m == n & !queenBlockMove & row + i + m <= 7 & col - k - n >= 0) {
-                                    queenMoveFields.put(row + i + m, col - k - n);
-                                    if (canJump(player, row, col, row + i, col - k, row + i + m, col - k - n)) {
-                                        CheckersMove queenMove = new CheckersMove(row, col, row + i + m, col - k - n);
-                                        jumpList.add(queenMove);
-                                        queenMove.setFieldToErase(queenJumpRowToErase, queenJumpColToErase);
-                                    }
-                                    queenMoveFields.clear();
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            setQueenBlockMove(false);
-            for (int i = 1; i < 8; i++) {
-                for (int k = 1; k < 8; k++) {
-                    if (i == k & !queenBlockMove) {
-                        for (int m = 1; m < 8; m++) {
-                            for (int n = 1; n < 8; n++) {
-                                if (m == n & !queenBlockMove & row - i - m >= 0 & col - k - n >= 0) {
-                                    queenMoveFields.put(row - i - m, col - k - n);
-                                    if (canJump(player, row, col, row - i, col - k, row - i - m, col - k - n)) {
-                                        CheckersMove queenMove = new CheckersMove(row, col, row - i - m, col - k - n);
-                                        jumpList.add(queenMove);
-                                        queenMove.setFieldToErase(queenJumpRowToErase, queenJumpColToErase);
-                                    }
-                                    queenMoveFields.clear();
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            setQueenBlockMove(false);
+            checkEachFieldDownRightForQueenJump(player, jumpList, row, col);
+            checkEachFieldUpRightForQueenJump(player, jumpList, row, col);
+            checkEachFieldDownLeftForQueenJump(player, jumpList, row, col);
+            checkEachFieldUpLeftForQueenJump(player, jumpList, row, col);
         }
         if (jumpList.size() == 0)
             return null;
